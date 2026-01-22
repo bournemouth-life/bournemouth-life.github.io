@@ -5,14 +5,14 @@
     <script src='https://x3dom.github.io/x3dom-dev/dist/x3dom-full.debug.js'></script>
     <link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'>
     <style>
-    #the_x3d {
-      width: 50%;
-      height: 50%;
+    x3d {
+      width: 1350px;
+      height: 675px;
     }
     </style>
   </head>
   <body onload='load()'>      
-  <x3d width='1200px' height='600px'>
+  <x3d>
     <scene>
     </scene>
   </x3d>
@@ -22,7 +22,6 @@
         
   <script>
 
-let canvas_x3d = document.querySelector('canvas');
 let canvas_texture = document.getElementById('canvas');
 let ip_th = document.getElementById('ip_th');
 
@@ -133,8 +132,7 @@ function makeX3D () {
 }
 
 function snapshot() {
-  let canvas = document.querySelector('canvas')
-  var dataURL = canvas.toDataURL("image/png");
+  var dataURL = canvas_x3d.toDataURL("image/png");
 
   var link = document.createElement('a');
   link.download = 'binf_logo_3D.png';
@@ -149,6 +147,7 @@ function setScene(x3d_xml) {
   ip_th.value=220;
   drawTexture(ip_th.value);
   setTexture();
+  window.canvas_x3d = document.querySelector('canvas');
 }
 
 function setTexture() {
