@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Logo using x3dom</title>
+    <script src='https://x3dom.github.io/x3dom-dev/dist/x3dom-full.debug.js'></script>
+    <link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'>
+    <style>
+    #the_x3d {
+      width: 50%;
+      height: 50%;
+    }
+    </style>
+  </head>
+  <body onload='load()'>      
+  <x3d>
+    <scene>
+    </scene>
+  </x3d>
+    <button onclick='snapshot()'>Snapshot</button>
+    <input type="number" id='ip_th' min="100" max="300" /><button onclick='texture()'>Texture</button><br>
+    <canvas id='canvas' width='300px' height='220px'></canvas>
+        
+  <script>
+
+let canvas_x3d = document.querySelector('canvas');
+let canvas_texture = document.getElementById('canvas');
+let ip_th = document.getElementById('ip_th');
+
+function texture() {
+  let h = ip_th.value;
+  drawTexture(h);
+  let it_1 = document.getElementById('it_1');
+  let data_url = canvas.toDataURL("image/png");
+  it_1.url = data_url;
+  it_2.url = data_url;
+}
+
+function lemniscate() {
+  const T = 32;
+  angles = [];
+  for (let t=0; t<T*2; t++) {
+    angles.push(Math.PI*(t/T+0.5));
+  }
+  
+  ret = [];
+
+  // NOTE: toFixed(2) is used to create a zig-zag effect in the lemniscate rendering.
+  
+  let str = '';
+  for (let t=0; t<=T; t++) {
+    angle = angles[t];
+    let x = 8.0 * Math.cos(angle);
+    let y = 2.0 * Math.sin(2 * angle);
+    let z = 0.75 * Math.cos(angle + Math.PI * 0.5);
+    str = str + x.toFixed(2) + ' ' + y.toFixed(2) + ' ' + z.toFixed(2) + '\n';
+  }
+  ret.push(str)
+
+  str = '';
+  for (let t=0; t<=T; t++) {
+    angle = angles[(t+T)%(2*T)];
+    let x = 8.0 * Math.cos(angle);
+    let y = 2.0 * Math.sin(2 * angle);
+    let z = 0.75 * Math.cos(angle + Math.PI * 0.5);
+    str = str + x.toFixed(2) + ' ' + y.toFixed(2) + ' ' + z.toFixed(2) + '\n';
+  }
+  ret.push(str);
+
+  return ret;
+}
+
+function load() {
+  let xml = makeX3D();
+  setScene(xml);
+}
+
+function makeX3D () {
+  let chingu = xmlChinGu();
+  let cross = xmlCross();
+  let pengyou = xmlPengYou();
+
+  var axis = `<Transform scale='4 4 4'>
+      <Inline DEF='CoordinateAxes'   url=' "https://www.web3d.org/x3d/content/examples/X3dForWebAuthors/Chapter03Grouping/CoordinateAxes.x3d"  '/>
+    </Transform>`;
+  axis='';
+  
+  var xml = `<X3D>
+  
+  <Scene>
+    <Viewpoint description='From above' position='8.2 2.75 11.0' orientation='-0.3 1 0 0.5'/>
+    <Transform rotation='0 0 1 0.45' translation='0 0 0'>
+      <Shape>
+        <Appearance>
+          <ImageTexture id='it_1'/>
+        </Appearance>
+        <Extrusion solid='false' beginCap='true' creaseAngle='1.2' crossSection='1 0 0.92 -0.38 0.71 -0.71 0.38 -0.92 0 -1 -0.38 -0.92 -0.71 -0.71 -0.92 -0.38 -1 -0 -0.92 0.38 -0.71 0.71 -0.38 0.92 0 1 0.38 0.92 0.71 0.71 0.92 0.38 1 0' endCap='true' spine='@SPINE_1'>  
+        <Color color='0 0 1, 0 1 0, 1 0 0' />
+        </Extrusion>
+        
+      </Shape>
+      <Shape>
+        <Appearance>
+          <ImageTexture id='it_2'/>
+        </Appearance>
+        <Extrusion solid='false' beginCap='true' creaseAngle='1.2' crossSection='1 0 0.92 -0.38 0.71 -0.71 0.38 -0.92 0 -1 -0.38 -0.92 -0.71 -0.71 -0.92 -0.38 -1 -0 -0.92 0.38 -0.71 0.71 -0.38 0.92 0 1 0.38 0.92 0.71 0.71 0.92 0.38 1 0' endCap='true' spine='@SPINE_2'>        
+        </Extrusion>
+      </Shape>
+      
+    </Transform>
+
+    <Transform translation='2.8 -2 1.5'>
+        ${pengyou}
+    </Transform>
+
+    <Transform translation='6.4 -2 0.5'>
+        ${chingu}
+    </Transform>
+
+    <Transform translation='-1.5 5 -0.5'>
+        ${cross}
+    </Transform>
+    
+    ${axis}
+    
+  </Scene>
+</X3D>`
+
+  let lem = lemniscate()
+  xml = xml.replace('@SPINE_1', lem[0]);
+  xml = xml.replace('@SPINE_2', lem[1]);
+
+  return xml;
+}
+
+function snapshot() {
+  let canvas = document.querySelector('canvas')
+  var dataURL = canvas.toDataURL("image/png");
+
+  var link = document.createElement('a');
+  link.download = 'binf_logo_3D.png';
+  link.href = dataURL;
+  link.click();
+};
+
+function setScene(x3d_xml) {
+  let browser = document.querySelector('X3D').runtime
+  let x3d = browser.createX3DFromString(x3d_xml);
+  browser.replaceWorld(x3d);
+  ip_th.value=220;
+  drawTexture(ip_th.value);
+  setTexture();
+}
+
+function setTexture() {
+  let it_1 = document.getElementById('it_1');
+  let data_url = canvas.toDataURL("image/png");
+  it_1.url = data_url;
+  it_2.url = data_url;
+}
+
+
+function stroke(len, curve, taper) {
+  let str = '';
+  let str_scale = '';
+  let T = 16;
+  let scale =       len / Math.cos(Math.PI*(0.5 - 0.25 * curve));
+  let y_offset = -scale * Math.sin(Math.PI*(0.5 - 0.25 * curve));
+  if (curve>0) {
+    let csscale = taper;
+    let csscale_step = (1-taper) / T; 
+    for (let t=-T; t<=T; t+=2) {
+      angle = Math.PI*(0.5 + 0.25 * curve * t/T);
+      let x = scale * Math.cos(angle);
+      let y = scale * Math.sin(angle) + y_offset;
+      str = str + x.toFixed(2) + ' ' + y.toFixed(2) + ' 0' + '\n';
+
+      str_scale = str_scale + `${csscale} ${csscale}` + '\n';
+      csscale = csscale + csscale_step;
+    }
+  } else {
+    str = `${-len} 0 0 ${len} 0 0`;
+    str_scale = `1 1 ${taper} ${taper}`;
+  }
+
+  let xml=`
+  <Transform translation='${-len} 0 0'>
+    <Shape>
+      <Appearance>
+        <Material diffuseColor='1 0 0'/>
+      </Appearance>
+      <Sphere></Sphere>
+    </Shape>
+  </Transform>
+  <Transform translation='${len} 0 0' scale='${taper} ${taper} ${taper}'>
+    <Shape>
+      <Appearance>
+        <Material diffuseColor='1 0 0'/>
+      </Appearance>
+      <Sphere></Sphere>
+    </Shape>
+  </Transform>
+  <Shape>
+    <Appearance>
+      <Material diffuseColor='1 0 0'/>
+    </Appearance>
+    <Extrusion solid='false' beginCap='true' creaseAngle='1.2' crossSection='1 0 0.92 -0.38 0.71 -0.71 0.38 -0.92 0 -1 -0.38 -0.92 -0.71 -0.71 -0.92 -0.38 -1 -0 -0.92 0.38 -0.71 0.71 -0.38 0.92 0 1 0.38 0.92 0.71 0.71 0.92 0.38 1 0' endCap='true' spine='${str}' scale='${str_scale}'>        
+    </Extrusion>
+  </Shape>`;
+
+  console.log(xml);
+  
+  return xml;
+}
+
+function tStroke(x,y,r,l,c,t,f) {
+  let sx = '0.1';
+  if (f) sx = '-0.1';
+  let xml = `
+  <Transform scale='${sx} 0.1 0.1' rotation='0 0 1 ${Math.PI*r/180}' translation='${x} ${y} 0'>
+    ${stroke(l,c,t)}
+  </Transform>`;
+  return xml;
+}
+
+function xmlCharFrame() {
+  let xml = `
+  <Transform scale='0.1 0.1 0.1' rotation='0 0 1 1.57' translation='-1 0 0'>
+    ${stroke(10,0,1)}
+  </Transform>
+  <Transform scale='0.1 0.1 0.1' rotation='0 0 1 1.57' translation='1 0 0'>
+    ${stroke(10,0,1)}
+  </Transform>
+  <Transform scale='0.1 0.1 0.1' translation='0 -1 0'>
+    ${stroke(10,0,1)}
+  </Transform>
+  <Transform scale='0.1 0.1 0.1' translation='0 1 0'>
+    ${stroke(10,0,1)}
+  </Transform>`;
+  return xml;
+}
+
+function xmlChin() {
+  let xml = '';
+  //xml += xmlCharFrame();
+  xml += tStroke(-0.45, 0.32, 240, 5, 0.8, 0.5);
+  xml += tStroke(-0.2, 0.55, 0, 4.5, 0, 1);
+  xml += tStroke(0.0, 0.13, 133, 3, 0.5, 0.75);
+  
+  xml += tStroke(0.6, 0.23, -90, 5.5, 0, 0.75);
+  
+  xml += tStroke(-0.35, -0.5, -110, 2.4, 0.1, 0.75);
+  xml += tStroke(0.2, -0.7, 180, 5.5, 0, 0.75);
+  return xml;
+}
+
+function xmlChinGu() {
+  let xml = `<Transform translation='-1 0 0'>
+    ${xmlChin()}
+  </Transform>
+  <Transform translation='1 0 0'>
+    ${xmlGu()}
+  </Transform>`;
+  return xml;
+}
+
+function xmlCross() {
+  let xml = `<Transform scale='2 2 2'>
+    ${tStroke(0,0,0,8,0,1)}
+    ${tStroke(0,-0.5,90,12,0,1)}
+  </Transform>`;
+  return xml;
+}
+
+function xmlGu() {
+  let xml = '';
+  //xml += xmlCharFrame();
+  xml += tStroke(0, 0.8, 2, 5, 0, 1);
+  xml += tStroke(0.45, 0.4, -100, 3.5, 0.1, 0.75);
+  xml += tStroke(-0.02, -0.05, 0, 7, 0, 1);
+  xml += tStroke(0, -0.5, -95, 3, 0, 0.75);
+  return xml;
+}
+
+function xmlPeng() {
+  let xml = '';
+  //xml += xmlCharFrame();
+  xml += tStroke(-0.58, 0.35, -90, 3.5, 0, 1);
+  xml += tStroke(-0.68, -0.45, -105, 3.5, 0.4, 0.75);
+
+  xml += tStroke(-0.38, 0.70, 190, 2.3, 0, 0.75);
+  xml += tStroke(-0.13, 0, -90, 7, 0, 0.75);
+  xml += tStroke(-0.3, -0.7, 150, 1.2, 0, 0.5);
+
+  xml += tStroke(-0.38, 0.30, 190, 2.3, 0, 0.75);
+  xml += tStroke(-0.38, -0.1, 190, 2.3, 0, 0.75);
+
+  xml += tStroke(0.24, 0.35, -90, 3.5, 0, 1);
+  xml += tStroke(0.14, -0.45, -105, 3.5, 0.4, 0.75);
+
+  xml += tStroke(0.47, 0.70, 190, 2.5, 0, 0.75);
+  xml += tStroke(0.75, 0, -90, 7, 0, 0.75);
+  xml += tStroke(0.58, -0.7, 150, 1.5, 0, 0.5);
+
+  xml += tStroke(0.47, 0.30, 190, 2.5, 0, 0.75);
+  xml += tStroke(0.47, -0.1, 190, 2.5, 0, 0.75);
+  return xml;
+}
+
+function xmlYou() {
+  let xml = '';
+  //xml += xmlCharFrame();
+  xml += tStroke(-0.3, 0.4, 260, 4, 0.2, 1);
+  xml += tStroke(-0.61, -0.4, 236, 4, 0.35, 0.5);
+  xml += tStroke(0, 0.5, 0, 7.5, 0, 1);
+
+  xml += tStroke(0.1, 0.1, 0, 4, 0, 1);
+  xml += tStroke(0.05, -0.35, 223, 6, 0.6, 0.75);
+  xml += tStroke(0.2, -0.35, 140, 6.4, 0.6, 0.7);
+  return xml;
+}
+
+function xmlPengYou() {
+  let xml = `<Transform translation='-1 0 0'>
+    ${xmlPeng()}
+  </Transform>
+  <Transform translation='1 0 0'>
+    ${xmlYou()}
+  </Transform>`;
+  return xml;
+}
+
+function drawTexture(h) {
+  canvas_texture.height = h;
+  const ctx = canvas_texture.getContext("2d");
+  
+  const gradient = ctx.createLinearGradient(0, 0, 300, 300);
+  
+  let N=4;
+  for (let n=0; n<N; n++) {
+    gradient.addColorStop((0/6+n)/N,  "#ff0000");
+    gradient.addColorStop((1/6+n)/N,  "#ffff00");
+    gradient.addColorStop((2/6+n)/N,  "#00ff00");
+    gradient.addColorStop((3/6+n)/N,  "#00ffff");
+    gradient.addColorStop((4/6+n)/N,  "#0000ff");
+    gradient.addColorStop((5/6+n)/N,  "#ff00ff");
+  }
+  gradient.addColorStop(1,"#ff0000");
+  
+  let Y=canvas.height;
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 300, Y);
+  
+  let markers = false;
+  if (markers) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(20, 0, 10, 10);
+    ctx.fillRect(95, 0, 10, 15);
+    ctx.fillRect(170, 0, 10, 20);
+    ctx.fillRect(250, Y-10, 10, 10);
+    ctx.fillRect(25, Y-15, 10, 15);
+    ctx.fillRect(100, Y-20, 10, 20);
+  }
+}
+    </script>
+  </body>
+</html>
