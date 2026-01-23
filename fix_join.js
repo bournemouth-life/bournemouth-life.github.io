@@ -71,6 +71,35 @@ Fixer.prototype.findGreys = function(pix) {
   return greys;
 };
 
+Fixer.prototype.group = function(x,y) {
+  // Find closest group
+  let min = 100;
+  let closest = 0;
+  for (let n = 0; n < this.groups.length; n++) {
+    let g = this.groups[n];
+    let dx = x - g.x;
+    let dy = y - g.y;
+    let dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < min) {
+      min = dist;
+      closest = n;
+    }
+  }
+
+  if (min > 5) {
+    // Create new group.
+    let g={x, y, points: []};
+    g.points.push(x,y);
+    this.groups.push(g);
+  } else {
+    // Add to existing group.
+    let g = this.groups[closest];
+    g.x = x;
+    g.y = y;
+    g.points.push(x,y);
+  }
+};
+
 Fixer.prototype.histMean = function(x) {
   let min = x[0];
   let max = x[0];
@@ -124,6 +153,7 @@ Fixer.prototype.mean = function(pix) {
 };
 
 Fixer.prototype.search = function() {
+  this.groups = [];
   const w = this.ctx.canvas.width;
   const h = this.ctx.canvas.height;
 
@@ -146,6 +176,7 @@ Fixer.prototype.search = function() {
           const i = cgreys[n];
           let x = (i/4) % cw;
           let y = ((i/4)-x) / cw;
+          this.group(cx*cw+x, cy*ch+y);
           greys.push([cx*cw+x, cy*ch+y]);
         }
       }
