@@ -4,21 +4,18 @@ function Fixer(canvas) {
 
 Fixer.prototype.fix = function() {
   
-  let centre = this.search();
-  let w = 80;
-  let h = 120;
-  let x = centre[0] - w/2;
-  let y = centre[1] - h/2;
-  let cnt0 = 0;
-  let cnt1 = 0;
-
+  let rect = this.search();
+  let x = rect[0] - 10;
+  let y = rect[1] - 20;
+  let w = rect[2] + 20;
+  let h = rect[3] + 40;
   const ctx = this.ctx;
   const imgd = ctx.getImageData(x, y, w, h);
   const pix = imgd.data;
 
   function filter(i) {
-    i=i+20;
-    let dx = 13;
+    i=i+16; // 4 pixels to right.
+    let dx = 8; // 8 pixel span.
     let leftR = pix[i-dx*4];
     let gradR = (pix[i]-leftR) / dx;
     let leftG = pix[i-dx*4+1];
@@ -35,19 +32,20 @@ Fixer.prototype.fix = function() {
     }
   }
 
-  fixes = [];
-  for (let i = 0; i < pix.length; i += 4) {
-    let max = pix[i];
-    if (pix[i+1] > max) max = pix[i+1];
-    if (pix[i+2] > max) max = pix[i+2];
-    let min = pix[i];
-    if (pix[i+1] < min) min = pix[i+1];
-    if (pix[i+2] < min) min = pix[i+2];
-    if ((min>10 || max<245) && (pix[i+3] > 128)) {
-      fixes.push(i);
+  let greys = this.findGreys(pix);
+  let y_prev = 0;
+  for (let n = 0; n < greys.length; n++) {
+    let i = greys[n];
+    let x = (i/4) % w;
+    let y = ((i/4) - x) / w;
+
+    // Apply filter only once for each row.
+    if (y > y_prev){
+      if ((x > 5) && (x < (w-5))) filter(i);
+      y_prev = y;
     }
   }
-  for (let n = 0; n<fixes.length; n++) filter(fixes[n]);
+
   ctx.putImageData(imgd, x, y);
 };
 
@@ -62,10 +60,6 @@ Fixer.prototype.findGreys = function(pix) {
     if (pix[i+2] < min) min = pix[i+2];
     if ((min>10 || max<245) && (pix[i+3] > 128)) {
       greys.push(i);
-      pix[i] = 0;
-      pix[i+1] = 0;
-      pix[i+2] = 0;
-      pix[i+3] = 255;
     }
   }
   return greys;
@@ -89,14 +83,14 @@ Fixer.prototype.group = function(x,y) {
   if (min > 5) {
     // Create new group.
     let g={x, y, points: []};
-    g.points.push(x,y);
+    g.points.push([x,y]);
     this.groups.push(g);
   } else {
     // Add to existing group.
     let g = this.groups[closest];
     g.x = x;
     g.y = y;
-    g.points.push(x,y);
+    g.points.push([x,y]);
   }
 };
 
@@ -180,12 +174,32 @@ Fixer.prototype.search = function() {
           greys.push([cx*cw+x, cy*ch+y]);
         }
       }
-      //ctx.putImageData(imgd, cx*cw, cy*ch);
     }
   }
 
-  let x = [];
-  let y = [];
-  greys.forEach((v) => {x.push(v[0]); y.push(v[1])});
-  return [this.histMean(x), this.histMean(y)];
+  // Get group with most points.
+  let max = 0;
+  let biggest = 0;
+  for (let n = 0; n < this.groups.length; n++) {
+    let np = this.groups[n].points.length;
+    if (np > max) {
+      max = np;
+      biggest = n;
+    }
+  }
+
+  // Get bounding rectangle of biggest group.
+  let points = this.groups[biggest].points;
+  let x_min = 10000;
+  let x_max = 0;
+  let y_min = 10000;
+  let y_max = 0;
+  for (let n = 0; n < points.length; n++) {
+    if (points[n][0] < x_min) x_min = points[n][0];
+    if (points[n][0] > x_max) x_max = points[n][0];
+    if (points[n][1] < y_min) y_min = points[n][1];
+    if (points[n][1] > y_max) y_max = points[n][1];
+  }
+
+  return [x_min, y_min, x_max - x_min, y_max-y_min]
 };
