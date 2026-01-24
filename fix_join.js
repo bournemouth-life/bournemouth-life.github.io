@@ -14,8 +14,8 @@ Fixer.prototype.fix = function() {
   const pix = imgd.data;
 
   function filter(i) {
-    i=i+16; // 4 pixels to right.
-    let dx = 8; // 8 pixel span.
+    i=i+20; // 5 pixels to right.
+    let dx = 10; // 10 pixel span.
     let leftR = pix[i-dx*4];
     let gradR = (pix[i]-leftR) / dx;
     let leftG = pix[i-dx*4+1];

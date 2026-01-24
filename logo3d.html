@@ -3,6 +3,7 @@
   <head>
     <title>Logo using x3dom</title>
     <script src='https://x3dom.github.io/x3dom-dev/dist/x3dom-full.debug.js'></script>
+    <script src='fix_join.js'></script>
     <link rel='stylesheet' type='text/css' href='https://www.x3dom.org/download/x3dom.css'>
     <style>
     x3d {
@@ -11,19 +12,57 @@
     }
     </style>
   </head>
-  <body onload='load()'>      
-  <x3d>
-    <scene>
-    </scene>
-  </x3d>
-    <button onclick='snapshot()'>Snapshot</button>
-    <input type="number" id='ip_th' min="100" max="300" /><button onclick='texture()'>Texture</button><br>
+  <body onload='load()'>
+    <div id='div_canvas'>
+      <x3d>
+        <scene>
+        </scene>
+      </x3d>
+    </div>
+    <input type="number" id='ip_th' min="100" max="300" /><button onclick='texture()'>Texture</button>
+    <button onclick='fix()'>Fix</button>
+    <button onclick='download()'>Download</button><br>
     <canvas id='canvas' width='300px' height='220px'></canvas>
-        
-  <script>
+    <script>
 
 let canvas_texture = document.getElementById('canvas');
 let ip_th = document.getElementById('ip_th');
+
+function fix() {
+  // Get image data from X3D canvas.
+  var data_url = canvas_x3d.toDataURL("image/png");
+
+  // Remove X3D and replace with canvas.
+  let div = document.getElementById('div_canvas');
+  div.innerHTML = `<div style="display:none;">
+      <img id="img" width="1400" height="800">
+    </div>
+    <canvas id="canvas_fix" width="1400" height="700" style="border:1px solid grey;">
+    </canvas>`;
+  let image = document.getElementById('img');
+  let canvas_fix = document.getElementById('canvas_fix');
+  ctx = canvas_fix.getContext("2d");
+  image.addEventListener("load", (e) => {
+
+    // Copy image onto canvas.
+    ctx.drawImage(image, 0, 0);
+
+    // Fix the lemniscate join.
+    let fixer = new Fixer(canvas_fix);
+    fixer.fix();
+  });
+  image.src = data_url;
+}
+
+function download() {
+  let canvas_fix = document.getElementById('canvas_fix');
+  var dataURL = canvas_fix.toDataURL("image/png");
+
+  var link = document.createElement('a');
+  link.download = 'BINF_infinity.png';
+  link.href = dataURL;
+  link.click();
+};
 
 function texture() {
   let h = ip_th.value;
@@ -130,15 +169,6 @@ function makeX3D () {
 
   return xml;
 }
-
-function snapshot() {
-  var dataURL = canvas_x3d.toDataURL("image/png");
-
-  var link = document.createElement('a');
-  link.download = 'binf_logo_3D.png';
-  link.href = dataURL;
-  link.click();
-};
 
 function setScene(x3d_xml) {
   let browser = document.querySelector('X3D').runtime
