@@ -4,6 +4,7 @@
     <title>Logo using x3dom</title>
     <script src='https://x3dom.github.io/x3dom-dev/dist/x3dom-full.debug.js'></script>
     <script src='fix_join.js'></script>
+    <script src='friend.js'></script>
     <link rel='stylesheet' type='text/css' href='https://www.x3dom.org/download/x3dom.css'>
     <style>
     x3d {
@@ -268,26 +269,21 @@ function xmlCharFrame() {
   return xml;
 }
 
-function xmlChin() {
+function xmlFriendChar(n) {
   let xml = '';
-  //xml += xmlCharFrame();
-  xml += tStroke(-0.45, 0.32, 240, 5, 0.8, 0.5);
-  xml += tStroke(-0.2, 0.55, 0, 4.5, 0, 1);
-  xml += tStroke(0.0, 0.13, 133, 3, 0.5, 0.75);
-  
-  xml += tStroke(0.6, 0.23, -90, 5.5, 0, 0.75);
-  
-  xml += tStroke(-0.35, -0.5, -110, 2.4, 0.1, 0.75);
-  xml += tStroke(0.2, -0.7, 180, 5.5, 0, 0.75);
+  friend_strokes[n].forEach((s) => {
+    console.log(s);
+    xml += tStroke.apply(null,s);
+  });
   return xml;
 }
 
 function xmlChinGu() {
   let xml = `<Transform translation='-1 0 0'>
-    ${xmlChin()}
+    ${xmlFriendChar(0)}
   </Transform>
   <Transform translation='1 0 0'>
-    ${xmlGu()}
+    ${xmlFriendChar(1)}
   </Transform>`;
   return xml;
 }
@@ -300,60 +296,12 @@ function xmlCross() {
   return xml;
 }
 
-function xmlGu() {
-  let xml = '';
-  //xml += xmlCharFrame();
-  xml += tStroke(0, 0.8, 2, 5, 0, 1);
-  xml += tStroke(0.45, 0.4, -100, 3.5, 0.1, 0.75);
-  xml += tStroke(-0.02, -0.05, 0, 7, 0, 1);
-  xml += tStroke(0, -0.5, -95, 3, 0, 0.75);
-  return xml;
-}
-
-function xmlPeng() {
-  let xml = '';
-  //xml += xmlCharFrame();
-  xml += tStroke(-0.58, 0.35, -90, 3.5, 0, 1);
-  xml += tStroke(-0.68, -0.45, -105, 3.5, 0.4, 0.75);
-
-  xml += tStroke(-0.38, 0.70, 190, 2.3, 0, 0.75);
-  xml += tStroke(-0.13, 0, -90, 7, 0, 0.75);
-  xml += tStroke(-0.3, -0.7, 150, 1.2, 0, 0.5);
-
-  xml += tStroke(-0.38, 0.30, 190, 2.3, 0, 0.75);
-  xml += tStroke(-0.38, -0.1, 190, 2.3, 0, 0.75);
-
-  xml += tStroke(0.24, 0.35, -90, 3.5, 0, 1);
-  xml += tStroke(0.14, -0.45, -105, 3.5, 0.4, 0.75);
-
-  xml += tStroke(0.47, 0.70, 190, 2.5, 0, 0.75);
-  xml += tStroke(0.75, 0, -90, 7, 0, 0.75);
-  xml += tStroke(0.58, -0.7, 150, 1.5, 0, 0.5);
-
-  xml += tStroke(0.47, 0.30, 190, 2.5, 0, 0.75);
-  xml += tStroke(0.47, -0.1, 190, 2.5, 0, 0.75);
-  return xml;
-}
-
-function xmlYou() {
-  let xml = '';
-  //xml += xmlCharFrame();
-  xml += tStroke(-0.3, 0.4, 260, 4, 0.2, 1);
-  xml += tStroke(-0.61, -0.4, 236, 4, 0.35, 0.5);
-  xml += tStroke(0, 0.5, 0, 7.5, 0, 1);
-
-  xml += tStroke(0.1, 0.1, 0, 4, 0, 1);
-  xml += tStroke(0.05, -0.35, 223, 6, 0.6, 0.75);
-  xml += tStroke(0.2, -0.35, 140, 6.4, 0.6, 0.7);
-  return xml;
-}
-
 function xmlPengYou() {
   let xml = `<Transform translation='-1 0 0'>
-    ${xmlPeng()}
+    ${xmlFriendChar(2)}
   </Transform>
   <Transform translation='1 0 0'>
-    ${xmlYou()}
+    ${xmlFriendChar(3)}
   </Transform>`;
   return xml;
 }
