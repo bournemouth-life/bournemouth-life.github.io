@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>친구朋友</title>
+    <script src='friend.js'></script>
+  </head>
+  
+<body>
+
+
+<svg id='svg1' onclick="sel1()" height="220" width="220" xmlns="http://www.w3.org/2000/svg"></svg>
+<svg id='svg2' onclick="sel2()" height="220" width="220" xmlns="http://www.w3.org/2000/svg"></svg>
+<svg id='svg3' onclick="sel3()" height="220" width="220" xmlns="http://www.w3.org/2000/svg"></svg>
+<svg id='svg4' onclick="sel4()" height="220" width="220" xmlns="http://www.w3.org/2000/svg"></svg>
+<textarea id='ta' cols='80' rows='20'></textarea><br>
+<button onclick='update()'>Update</button>
+
+<script>
+
+function initCharBG() {
+  let xml1 = `<rect width="200" height="200" x="10" y="10" fill="#ff8080" />
+    <text x="25" y="180" font-size="190" fill="black">친</text>
+  `;
+
+  let xml2 = `<rect width="200" height="200" x="10" y="10" fill="#80ff80" />
+    <text x="20" y="180" font-size="190" fill="black">구</text>
+  `;
+
+  let xml3 = `<rect width="200" height="200" x="10" y="10" fill="#ff8080" />
+    <text x="20" y="180" font-size="190" fill="black">朋</text>
+  `;
+
+  let xml4 = `<rect width="200" height="200" x="10" y="10" fill="#80ff80" />
+    <text x="15" y="180" font-size="190" fill="black">友</text>
+  `;
+
+  let xml = [xml1, xml2, xml3, xml4];
+  for (let n=0; n<=3; n++) document.getElementById('svg'+(n+1)).innerHTML = xml[n];
+  return xml;
+}
+
+function select(n) {
+  let ta = document.getElementById('ta');
+  ta.value = JSON.stringify(friend_strokes[n]);
+  lastSelected = n;
+}
+
+function sel1() {
+  select(0);
+}
+
+function sel2() {
+  select(1);
+}
+
+function sel3() {
+  select(2);
+}
+
+function sel4() {
+  select(3);
+}
+
+function stroke(len, curve, taper) {
+  let str = '';
+  let T = 16;
+  let scale =       len / Math.cos(Math.PI*(0.5 - 0.25 * curve));
+  let y_offset = -scale * Math.sin(Math.PI*(0.5 - 0.25 * curve));
+  if (curve>0) {
+    let csscale = taper;
+    let csscale_step = (1-taper) / T; 
+    for (let t=-T; t<=T; t+=2) {
+      angle = Math.PI*(0.5 + 0.25 * curve * t/T);
+      let x = scale * Math.cos(angle);
+      let y = scale * Math.sin(angle) + y_offset;
+      str +=`<circle fill="#8080ff" opacity="0.7" cx="${x}" cy="${y}" r="${csscale}" />`
+      csscale = csscale + csscale_step;
+    }
+  } else {
+    let csscale = taper;
+    let csscale_step = (1-taper) / T; 
+    for (let t=-T; t<=T; t+=2) {
+      let x = -t*len/T;
+      str +=`<circle fill="#8080ff" opacity="0.7" cx="${x}" cy="0" r="${csscale}" />`
+      csscale = csscale + csscale_step;
+    }
+  }
+  return str;
+}
+
+function tStroke(x,y,r,l,c,t,f) {
+  let sx = '10';
+  if (f) sx = '-10';
+  let xml = `
+  <g transform="translate(${x*100+110},${110-y*100}) rotate(${-r},0,0) scale(${sx},-10)">
+    ${stroke(l,c,t)}
+  </g>`;
+  console.log(xml);
+  return xml;
+}
+
+
+function update() {
+  let svg = document.getElementById('svg'+(lastSelected+1));
+  let ta = document.getElementById('ta');
+  let xml = cgb[lastSelected];
+  friend_strokes[lastSelected] = JSON.parse(ta.value);
+  xml += xmlFriendChar(lastSelected)
+  svg.innerHTML = xml;
+};
+
+function xmlFriendChar(n) {
+  let xml = '';
+  friend_strokes[n].forEach((s) => {
+    console.log(s);
+    xml += tStroke.apply(null,s);
+  });
+  return xml;
+}
+
+let lastSelected = 0;
+let cgb = initCharBG();
+  
+</script>
+
+</body>
+</html>
