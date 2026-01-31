@@ -1,5 +1,6 @@
 let canvas_cup = null;
 let canvas_cake1 = null;
+let canvas_cake2 = null;
 
 function draw(images) {
   // 1819 x 2551 pixels to accommodate trim
@@ -10,8 +11,9 @@ function draw(images) {
   const ctx_front = canvas_front.getContext("2d");
   const ctx_back = canvas_back.getContext("2d");
   drawLogo(ctx_front, ctx_back, images.logo.img);
-  ctx_front.drawImage(canvas_cup, 100, 200, 100, 100);
-  ctx_front.drawImage(canvas_cake1, 200, 500, 100, 100);
+  ctx_front.drawImage(canvas_cup, 100, 600, 100, 100);
+  ctx_front.drawImage(canvas_cake1, 300, 600, 100, 100);
+  ctx_front.drawImage(canvas_cake2, 500, 600, 100, 100);
 }
 
 function drawLogo(ctx_front, ctx_back, img) {
@@ -30,7 +32,34 @@ function drawLogo(ctx_front, ctx_back, img) {
 
 function fixCake1(img) {
   canvas_cake1 = createCanvasFromImage(img);
+
+  // Make unwanted bits black.
+  const ctx = canvas_cake1.getContext("2d");
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, 100, 100);
+  ctx.fillRect(350, 50, 100, 100);
+  ctx.fillRect(360, 150, 100, 100);
+  ctx.fillRect(370, 200, 100, 100);
+  ctx.fillRect(400, 250, 100, 100);
+  ctx.fillRect(425, 275, 100, 100);
+  ctx.fillRect(450, 0, 450, 600);
+
   removeDarkBackground(canvas_cake1, 128);
+}
+
+function fixCake2(img) {
+  canvas_cake2 = createCanvasFromImage(img);
+
+  // Make unwanted bits black.
+  const ctx = canvas_cake2.getContext("2d");
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, 370, 620);
+  ctx.fillRect(310, 340, 100, 100);
+  ctx.fillRect(335, 360, 100, 100);
+  ctx.fillRect(335, 390, 400, 300);
+  ctx.fillRect(650, 360, 250, 300);
+
+  removeDarkBackground(canvas_cake2, 128);
 }
 
 function fixCup(img) {
