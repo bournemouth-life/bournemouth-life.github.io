@@ -3,13 +3,14 @@ function createCanvas(w,h) {
   canvas.width = w;
   canvas.height = h;
   document.body.appendChild(canvas);
-  return canvas.getContext("2d");
+  return canvas;
 }
 
 function createCanvasFromImage(img) {
-  let ctx = createCanvas(img.width, img.height);
+  let canvas = createCanvas(img.width, img.height);
+  let ctx = canvas.getContext("2d");
   ctx.drawImage(img, 0, 0);
-  return ctx;
+  return canvas;
 }
 
 function loadImage(fn, callback) {
@@ -24,7 +25,8 @@ function loadImage(fn, callback) {
   div.appendChild(img);
 }
 
-function removeDarkBackground(ctx, threshold) {
+function removeDarkBackground(canvas, threshold) {
+  const ctx = canvas.getContext("2d");
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
   const imgd = ctx.getImageData(0, 0, w, h);
