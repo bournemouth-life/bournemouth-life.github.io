@@ -98,5 +98,22 @@ function fixPrayer(img) {
   const sh = scale * h;
   ctx.drawImage(img, 400, 700, sw, sh, 0, 0, w, h);
 
-  fixGod();
+  //fixGod();
+  fixSerenity();
+}
+
+function fixSerenity() {
+  const h = 240;
+  const w = 500;
+  const canvas = createCanvas(w, h);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(canvas_prayer, 960, 100, w, h, 0, 0, w, h);
+  toBW(canvas, 128);
+
+  ctx.strokeStyle = '#0000ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(227, 186);
+  ctx.bezierCurveTo(215, 210, 268, 245, 298, 215);
+  ctx.stroke();
 }
