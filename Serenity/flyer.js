@@ -1,6 +1,7 @@
 let canvas_cup = null;
 let canvas_cake1 = null;
 let canvas_cake2 = null;
+let canvas_prayer = null;
 
 function draw(images) {
   // 1819 x 2551 pixels to accommodate trim
@@ -67,16 +68,35 @@ function fixCup(img) {
   removeDarkBackground(canvas_cup, 92);
 }
 
-function loadImages(callback) {
-  let images = {logo: {fn: 'images/Logo.jpg'}, cup: {fn: 'images/cup.png'}, cakes: {fn: 'images/cakes.png'}};
-  let cnt = 0;
-  for (let i in images) {
-    cnt++;
-    let obj = images[i];
-    loadImage(obj.fn, (img) => {
-      obj.img = img;
-      cnt--;
-      if (cnt==0) callback(images);
-    });
-  }
+function fixGod() {
+  const h = 290;
+  const w = 550;
+  const canvas = createCanvas(w, h);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(canvas_prayer, 200, 0, w, h, 0, 0, w, h);
+  toBW(canvas, 150);
+
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(430, 36);
+  ctx.bezierCurveTo(442, 24, 488, 18, 500, 30);
+  ctx.stroke();
+
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(325,178,225,112);
+}
+
+function fixPrayer(img) {
+  const w = 1500;
+  const h = 750;
+  canvas_prayer = createCanvas(w,h);
+
+  const ctx = canvas_prayer.getContext("2d");
+  const scale = 2.3;
+  const sw = scale * w;
+  const sh = scale * h;
+  ctx.drawImage(img, 400, 700, sw, sh, 0, 0, w, h);
+
+  fixGod();
 }

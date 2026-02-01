@@ -10,14 +10,11 @@
   <body>
     <script>
 
-let images = {logo: {fn: 'images/Logo.jpg'}, cup: {fn: 'images/cup.png'}, cakes: {fn: 'images/cakes.png'}};
+let images = {prayer: {fn: 'images/SerenityPrayer.jpg'}};
 
 loadImages(images, () => {
   console.log(images);
-  fixCup(images.cup.img);
-  fixCake1(images.cakes.img);
-  fixCake2(images.cakes.img);
-  draw(images);
+  fixPrayer(images.prayer.img);
 });
     </script>
   </body>
