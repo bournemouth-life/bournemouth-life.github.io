@@ -1,3 +1,18 @@
+function clampAlpha(canvas, min, max) {
+  const ctx = canvas.getContext("2d");
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const imgd = ctx.getImageData(0, 0, w, h);
+  const pix = imgd.data;
+
+  for (let i = 0; i < pix.length; i+=4) {
+    if (pix[i+3] > max) pix[i+3] = max;
+    if (pix[i+3] < min) pix[i+3] = min;
+  }
+
+  ctx.putImageData(imgd, 0, 0);
+}
+
 function createCanvas(w,h) {
   let canvas = document.createElement('canvas');
   canvas.width = w;
@@ -48,6 +63,22 @@ function removeDarkBackground(canvas, threshold) {
   for (let i = 0; i < pix.length; i+=4) {
     let gs = (pix[i] + pix[i+1] + pix[i+2]) / 3;
     if (gs <= threshold) pix[i+3] = 0;
+  }
+
+  ctx.putImageData(imgd, 0, 0);
+}
+
+function scaleBrightness(canvas, scale) {
+  const ctx = canvas.getContext("2d");
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const imgd = ctx.getImageData(0, 0, w, h);
+  const pix = imgd.data;
+
+  for (let i = 0; i < pix.length; i+=4) {
+    pix[i] = scale * pix[i];
+    pix[i+1] = scale * pix[i+1];
+    pix[i+2] = scale * pix[i+2];
   }
 
   ctx.putImageData(imgd, 0, 0);

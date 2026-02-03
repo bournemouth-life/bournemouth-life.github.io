@@ -2,22 +2,27 @@
 <html>
   <head>
     <meta charset='utf-8'>
-    <title>Serenity Cup</title>
+    <title>Serenity Flyer</title>
     <script src='../scripts/graphics.js'></script>
     <script src='flyer.js'></script>
+    <script src='prices.js'></script>
   </head>
   
   <body>
     <script>
 
 let images = {logo: {fn: 'images/Logo.jpg'}, cup: {fn: 'images/cup.png'}, cakes: {fn: 'images/cakes.png'}};
+images.prayer = {fn: 'images/SerenityPrayer.png'};
+images.binf   = {fn: '../images/BINF_infinity.png'};
 
 loadImages(images, () => {
   console.log(images);
   fixCup(images.cup.img);
   fixCake1(images.cakes.img);
   fixCake2(images.cakes.img);
+  fixImages(images);
   draw(images);
+  drawLists(lists);
 });
     </script>
   </body>

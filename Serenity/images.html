@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Serenity Images</title>
+    <script src='../scripts/graphics.js'></script>
+    <script src='flyer.js'></script>
+  </head>
+  <body>
+    <script>
+
+let images = {images: {fn: 'originals/2.jpg'}};
+images.prayer = {fn: 'originals/SerenityPrayer.jpg'};
+
+loadImages(images, () => {
+  document.body.style.backgroundColor = "blue";
+
+  // Bottle.
+  let canvas = fix500(images.images.img, 1185, 112, 4.4);
+  let ctx = canvas.getContext("2d");
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, 100, 500);
+  removeDarkBackground(canvas, 48);
+
+  fix500(images.images.img, 772, 1120, 4.3); // Can.
+  fix500(images.images.img, 495, 770, 3.65); // Glass.
+  fix500(images.images.img, 575, 130, 4.55); // Keg.
+  fix500(images.images.img, 1100, 766, 3.8); // Wine.
+
+  canvas = fixPrayer(images.prayer.img);
+  prayerText(canvas);
+});
+    </script>
+  </body>
+</html>
